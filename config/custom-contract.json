@@ -1,0 +1,23 @@
+{
+  "id": "CONTRACT-002",
+  "title": "Custom Contract Example",
+  "parties": [
+    {
+      "name": "Alice Johnson",
+      "role": "client",
+      "email": "alice@example.com"
+    },
+    {
+      "name": "Bob Wilson",
+      "role": "provider",
+      "email": "bob@example.com"
+    }
+  ],
+  "terms": {
+    "startDate": "2023-06-01",
+    "endDate": "2024-05-31",
+    "value": 75000.00,
+    "currency": "EUR"
+  },
+  "status": "pending"
+} 

@@ -31,19 +31,22 @@ type Contract struct {
 	Status  string  `json:"status"`
 }
 
-// LoadContract reads the contract.json file from the config directory and returns a Contract object
-func LoadContract() (*Contract, error) {
-	// Get the current working directory
-	wd, err := os.Getwd()
-	if err != nil {
-		return nil, fmt.Errorf("error getting working directory: %v", err)
+// LoadContract reads the contract.json file from the specified path and returns a Contract object
+func LoadContract(filePath string) (*Contract, error) {
+	// If no file path is provided, use the default path
+	if filePath == "" {
+		// Get the current working directory
+		wd, err := os.Getwd()
+		if err != nil {
+			return nil, fmt.Errorf("error getting working directory: %v", err)
+		}
+
+		// Construct the path to the contract.json file
+		filePath = filepath.Join(wd, "config", "contract.json")
 	}
 
-	// Construct the path to the contract.json file
-	contractPath := filepath.Join(wd, "config", "contract.json")
-
 	// Read the file
-	data, err := os.ReadFile(contractPath)
+	data, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("error reading contract file: %v", err)
 	}

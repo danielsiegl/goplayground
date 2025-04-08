@@ -10,6 +10,7 @@ A simple command-line interface program written in Go that demonstrates basic CL
 - Support for additional arguments
 - Contract information display from JSON file
 - Contract information export to Markdown
+- Customizable contract file path
 
 ## Usage
 
@@ -44,6 +45,9 @@ Run the program with various options:
 
 # Output contract to markdown file
 ./goplayground -output-md
+
+# Use a custom contract file
+./goplayground -contract -contract-file config/custom-contract.json
 ```
 
 ## Available Flags
@@ -53,10 +57,15 @@ Run the program with various options:
 - `-uppercase`: Print greeting in uppercase (default: false)
 - `-contract`: Show contract information from config/contract.json (default: false)
 - `-output-md`: Output contract information to output.md (default: false)
+- `-contract-file`: Path to the contract.json file (default: "config/contract.json")
 
 ## Contract Configuration
 
-The program can read contract information from a JSON file located at `config/contract.json`. The contract file should follow this structure:
+The program can read contract information from a JSON file. By default, it looks for `config/contract.json`, but you can specify a different file using the `-contract-file` flag.
+
+### Default Contract File
+
+The default contract file should follow this structure:
 
 ```json
 {
@@ -84,6 +93,20 @@ The program can read contract information from a JSON file located at `config/co
 }
 ```
 
+### Custom Contract Files
+
+You can create custom contract files with different data and specify them at runtime:
+
+```bash
+./goplayground -contract -contract-file config/custom-contract.json
+```
+
+You can also set a default contract file at build time:
+
+```bash
+go build -ldflags "-X main.defaultContractFile=config/custom-contract.json"
+```
+
 ## Markdown Output
 
 When using the `-output-md` flag, the program will generate an `output.md` file with the contract information formatted in Markdown. The output will include:
@@ -101,4 +124,27 @@ To build the program, simply run:
 go build
 ```
 
-This will create an executable named `goplayground` in the current directory. 
+This will create an executable named `goplayground` in the current directory.
+
+### Cross-Platform Building
+
+The repository includes a PowerShell script (`build.ps1`) that builds the application for multiple platforms:
+
+```powershell
+./build.ps1
+```
+
+This will create executables for:
+- Linux (amd64 and arm64)
+- Windows (amd64 and arm64)
+- macOS (arm64 for M1/M2/M3)
+
+The built files will be placed in the `bin` directory.
+
+### Building with Custom Contract File
+
+You can also build the application with a custom default contract file:
+
+```powershell
+./build.ps1 -ContractFile "config/custom-contract.json"
+``` 

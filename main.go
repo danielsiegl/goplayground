@@ -7,6 +7,9 @@ import (
 	"strings"
 )
 
+// defaultContractFile is set at build time using -ldflags
+var defaultContractFile string
+
 func main() {
 	// Define command-line flags
 	name := flag.String("name", "World", "Name to greet")
@@ -15,12 +18,20 @@ func main() {
 	showContract := flag.Bool("contract", false, "Show contract information")
 	outputMarkdown := flag.Bool("output-md", false, "Output contract to output.md")
 
+	// Set default contract file path
+	defaultPath := "config/contract.json"
+	if defaultContractFile != "" {
+		defaultPath = defaultContractFile
+	}
+
+	contractFile := flag.String("contract-file", defaultPath, "Path to the contract.json file")
+
 	// Parse the flags
 	flag.Parse()
 
 	// Handle contract display if requested
 	if *showContract || *outputMarkdown {
-		contract, err := LoadContract()
+		contract, err := LoadContract(*contractFile)
 		if err != nil {
 			fmt.Printf("Error loading contract: %v\n", err)
 			return

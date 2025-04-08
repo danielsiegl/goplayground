@@ -2,7 +2,8 @@ function Build-GoApplication {
     param (
         [string]$GOOS,
         [string]$GOARCH = "amd64",
-        [string]$CGO_ENABLED = "0"
+        [string]$CGO_ENABLED = "0",
+        [string]$ContractFile = ""
     )
 
     # Store original environment variables
@@ -25,8 +26,14 @@ function Build-GoApplication {
             "goplayground-$GOOS-$GOARCH"
         }
 
+        # Build command with contract file if specified
+        $buildCmd = "go build -o $outputFile"
+        if ($ContractFile -ne "") {
+            $buildCmd += " -ldflags `"-X main.defaultContractFile=$ContractFile`""
+        }
+        
         # Perform the build
-        go build -o $outputFile
+        Invoke-Expression $buildCmd
         
         # Create bin directory if it doesn't exist
         $binDir = "bin"
@@ -63,5 +70,27 @@ Build-GoApplication -GOOS "windows" -GOARCH "arm64"
 
 # Build for macOS on M1,M2,M3,..
 Build-GoApplication -GOOS "darwin" -GOARCH "arm64"
+
+# Build with custom contract file
+# Build-GoApplication -GOOS "linux" -ContractFile "config/custom-contract.json"
+
+# Copy config files to bin directory
+$configDir = "config"
+$binDir = "bin"
+
+# Create config directory in bin if it doesn't exist
+$binConfigDir = Join-Path -Path $binDir -ChildPath "config"
+if (-not (Test-Path -Path $binConfigDir)) {
+    New-Item -ItemType Directory -Path $binConfigDir | Out-Null
+    Write-Output "Created config directory in bin"
+}
+
+# Copy all JSON files from config to bin/config
+Get-ChildItem -Path $configDir -Filter "*.json" | ForEach-Object {
+    Copy-Item -Path $_.FullName -Destination $binConfigDir -Force
+    Write-Output "Copied config file to bin: $($_.Name)"
+}
+
+Write-Output "All builds complete and config files copied to bin directory"
 
 
