@@ -1,6 +1,6 @@
 # Simple Go CLI Program
 
-A simple command-line interface program written in Go that demonstrates basic CLI features including flags, argument handling, and SQLite database operations.
+A simple command-line interface program written in Go that demonstrates basic CLI features including flags and argument handling.
 
 ## Features
 
@@ -8,20 +8,6 @@ A simple command-line interface program written in Go that demonstrates basic CL
 - Configurable number of repetitions
 - Option to display greeting in uppercase
 - Support for additional arguments
-- SQLite database integration with sample user data
-
-## Prerequisites
-
-- Go 1.21 or later
-- GCC (required for SQLite driver compilation)
-
-## Installation
-
-1. Clone the repository
-2. Install dependencies:
-```bash
-go mod download
-```
 
 ## Usage
 
@@ -50,9 +36,6 @@ Run the program with various options:
 
 # Add additional arguments
 ./goplayground -name Alice extra arg1 arg2
-
-# Show users from database
-./goplayground -users
 ```
 
 ## Available Flags
@@ -60,16 +43,6 @@ Run the program with various options:
 - `-name`: Name to greet (default: "World")
 - `-count`: Number of times to print the greeting (default: 1)
 - `-uppercase`: Print greeting in uppercase (default: false)
-- `-users`: Show users from the SQLite database (default: false)
-
-## Database
-
-The program includes a SQLite database (`users.db`) that is automatically created when you first run the program with the `-users` flag. The database contains a sample table of users with the following fields:
-- id (INTEGER, PRIMARY KEY)
-- name (TEXT)
-- email (TEXT, UNIQUE)
-
-Sample data is automatically inserted when the database is first created.
 
 ## Building
 
