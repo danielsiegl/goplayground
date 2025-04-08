@@ -27,7 +27,22 @@ function Build-GoApplication {
 
         # Perform the build
         go build -o $outputFile
-        Write-Output "Created: '$outputFile'"
+        
+        # Create bin directory if it doesn't exist
+        $binDir = "bin"
+        if (-not (Test-Path -Path $binDir)) {
+            New-Item -ItemType Directory -Path $binDir | Out-Null
+            Write-Output "Created bin directory"
+        }
+        
+        # Copy the built file to the bin directory
+        Copy-Item -Path $outputFile -Destination $binDir -Force
+        Write-Output "Copied to bin directory: '$binDir/$outputFile'"
+        
+        # Clean up the original file
+        Remove-Item -Path $outputFile -Force
+        Write-Output "Cleaned up original build file"
+        
         Write-Output "$GOOS build complete"
     }
     finally {
