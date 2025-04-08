@@ -1,0 +1,23 @@
+{
+  "id": "CONTRACT-001",
+  "title": "Sample Contract",
+  "parties": [
+    {
+      "name": "John Doe",
+      "role": "buyer",
+      "email": "john@example.com"
+    },
+    {
+      "name": "Jane Smith",
+      "role": "seller",
+      "email": "jane@example.com"
+    }
+  ],
+  "terms": {
+    "startDate": "2023-01-01",
+    "endDate": "2023-12-31",
+    "value": 50000.00,
+    "currency": "USD"
+  },
+  "status": "active"
+}

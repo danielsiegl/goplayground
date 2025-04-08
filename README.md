@@ -1,6 +1,6 @@
 # Simple Go CLI Program
 
-A simple command-line interface program written in Go that demonstrates basic CLI features including flags and argument handling.
+A simple command-line interface program written in Go that demonstrates basic CLI features including flags, argument handling, and JSON file parsing.
 
 ## Features
 
@@ -8,6 +8,7 @@ A simple command-line interface program written in Go that demonstrates basic CL
 - Configurable number of repetitions
 - Option to display greeting in uppercase
 - Support for additional arguments
+- Contract information display from JSON file
 
 ## Usage
 
@@ -36,6 +37,9 @@ Run the program with various options:
 
 # Add additional arguments
 ./goplayground -name Alice extra arg1 arg2
+
+# Show contract information
+./goplayground -contract
 ```
 
 ## Available Flags
@@ -43,6 +47,37 @@ Run the program with various options:
 - `-name`: Name to greet (default: "World")
 - `-count`: Number of times to print the greeting (default: 1)
 - `-uppercase`: Print greeting in uppercase (default: false)
+- `-contract`: Show contract information from config/contract.json (default: false)
+
+## Contract Configuration
+
+The program can read contract information from a JSON file located at `config/contract.json`. The contract file should follow this structure:
+
+```json
+{
+  "id": "CONTRACT-001",
+  "title": "Sample Contract",
+  "parties": [
+    {
+      "name": "John Doe",
+      "role": "buyer",
+      "email": "john@example.com"
+    },
+    {
+      "name": "Jane Smith",
+      "role": "seller",
+      "email": "jane@example.com"
+    }
+  ],
+  "terms": {
+    "startDate": "2023-01-01",
+    "endDate": "2023-12-31",
+    "value": 50000.00,
+    "currency": "USD"
+  },
+  "status": "active"
+}
+```
 
 ## Building
 
