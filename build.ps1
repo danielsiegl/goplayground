@@ -46,4 +46,7 @@ Build-GoApplication -GOOS "linux" -GOARCH "arm64"
 Build-GoApplication -GOOS "windows"
 Build-GoApplication -GOOS "windows" -GOARCH "arm64"
 
+# Build for macOS on M1,M2,M3,..
+Build-GoApplication -GOOS "darwin" -GOARCH "arm64"
+
 
