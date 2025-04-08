@@ -9,6 +9,7 @@ A simple command-line interface program written in Go that demonstrates basic CL
 - Option to display greeting in uppercase
 - Support for additional arguments
 - Contract information display from JSON file
+- Contract information export to Markdown
 
 ## Usage
 
@@ -40,6 +41,9 @@ Run the program with various options:
 
 # Show contract information
 ./goplayground -contract
+
+# Output contract to markdown file
+./goplayground -output-md
 ```
 
 ## Available Flags
@@ -48,6 +52,7 @@ Run the program with various options:
 - `-count`: Number of times to print the greeting (default: 1)
 - `-uppercase`: Print greeting in uppercase (default: false)
 - `-contract`: Show contract information from config/contract.json (default: false)
+- `-output-md`: Output contract information to output.md (default: false)
 
 ## Contract Configuration
 
@@ -78,6 +83,16 @@ The program can read contract information from a JSON file located at `config/co
   "status": "active"
 }
 ```
+
+## Markdown Output
+
+When using the `-output-md` flag, the program will generate an `output.md` file with the contract information formatted in Markdown. The output will include:
+
+- Basic contract information (ID, Title, Status)
+- Parties involved (with names, roles, and emails)
+- Contract terms (period and value)
+
+The markdown file can be viewed in any markdown viewer or converted to other formats using markdown tools.
 
 ## Building
 
