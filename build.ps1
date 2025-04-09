@@ -2,7 +2,7 @@ function Build-GoApplication {
     param (
         [string]$GOOS,
         [string]$GOARCH = "amd64",
-        [string]$CGO_ENABLED = "1",
+        [string]$CGO_ENABLED = "0",
         [string]$ContractFile = ""
     )
 
