@@ -19,16 +19,20 @@ type DB struct {
 func InitDB(dbPath string) (*DB, error) {
 	// Create the database directory if it doesn't exist
 	dbDir := filepath.Dir(dbPath)
-	if _, err := os.Stat(dbDir); os.IsNotExist(err) {
-		if err := os.MkdirAll(dbDir, 0755); err != nil {
-			return nil, fmt.Errorf("error creating database directory: %v", err)
-		}
+	if err := os.MkdirAll(dbDir, 0755); err != nil {
+		return nil, fmt.Errorf("error creating database directory: %v", err)
 	}
 
 	// Open the database
 	db, err := sql.Open(sqlite.DriverName, dbPath)
 	if err != nil {
 		return nil, fmt.Errorf("error opening database: %v", err)
+	}
+
+	// Test the connection
+	if err := db.Ping(); err != nil {
+		db.Close()
+		return nil, fmt.Errorf("error connecting to database: %v", err)
 	}
 
 	// Create the contracts table if it doesn't exist
