@@ -1,125 +1,109 @@
 # Contract Viewer CLI
 
-A simple command-line interface program written in Go that demonstrates JSON file parsing and contract information display.
+A command-line tool for viewing, storing, and managing contracts.
 
 ## Features
 
-- Contract information display from JSON file
-- Contract information export to Markdown
+- Read contract information from JSON files
+- Display contract information in the console
+- Output contract information as markdown
+- Store contracts in SQLite database
+- List all contracts in the database
+- Delete contracts from the database
 - Customizable contract file path
 
 ## Usage
 
-Build the program:
 ```bash
-go build
-```
-
-Run the program with various options:
-
-```bash
-# Show contract information
+# Display contract information
 ./goplayground -contract
 
-# Output contract to markdown file
+# Output contract to markdown
 ./goplayground -output-md
 
-# Use a custom contract file
+# Store contract in database
+./goplayground -store
+
+# List all contracts in database
+./goplayground -list
+
+# Delete a contract from database
+./goplayground -delete "contract-id"
+
+# Specify a custom contract file
 ./goplayground -contract -contract-file config/custom-contract.json
+
+# Specify a custom database file
+./goplayground -store -db data/custom.db
 ```
 
 ## Available Flags
 
-- `-contract`: Show contract information from config/contract.json (default: false)
-- `-output-md`: Output contract information to output.md (default: false)
-- `-contract-file`: Path to the contract.json file (default: "config/contract.json")
+- `-contract`: Display contract information
+- `-output-md`: Output contract to output.md
+- `-store`: Store contract in database
+- `-list`: List all contracts in database
+- `-delete`: Delete contract with the specified ID from database
+- `-contract-file`: Path to the contract.json file (default: config/contract.json)
+- `-db`: Path to the SQLite database file (default: data/contracts.db)
 
 ## Contract Configuration
 
-The program can read contract information from a JSON file. By default, it looks for `config/contract.json`, but you can specify a different file using the `-contract-file` flag.
+The program reads contract information from a JSON file. The default contract file is located at `config/contract.json`. You can create custom contract files following the same structure.
 
-### Default Contract File
-
-The default contract file should follow this structure:
-
+Example contract.json:
 ```json
 {
-  "id": "CONTRACT-001",
-  "title": "Sample Contract",
-  "parties": [
-    {
-      "name": "John Doe",
-      "role": "buyer",
-      "email": "john@example.com"
+    "id": "CONTRACT-001",
+    "title": "Sample Contract",
+    "parties": [
+        {
+            "name": "Alice Johnson",
+            "role": "Client",
+            "email": "alice@example.com"
+        },
+        {
+            "name": "Bob Wilson",
+            "role": "Provider",
+            "email": "bob@example.com"
+        }
+    ],
+    "terms": {
+        "startDate": "2024-01-01",
+        "endDate": "2024-12-31",
+        "value": 50000.00,
+        "currency": "USD"
     },
-    {
-      "name": "Jane Smith",
-      "role": "seller",
-      "email": "jane@example.com"
-    }
-  ],
-  "terms": {
-    "startDate": "2023-01-01",
-    "endDate": "2023-12-31",
-    "value": 50000.00,
-    "currency": "USD"
-  },
-  "status": "active"
+    "status": "Active"
 }
 ```
 
-### Custom Contract Files
+## Database
 
-You can create custom contract files with different data and specify them at runtime:
+The program uses SQLite to store contracts. The database file is created at `data/contracts.db` by default. You can specify a custom database file using the `-db` flag.
 
-```bash
-./goplayground -contract -contract-file config/custom-contract.json
-```
-
-You can also set a default contract file at build time:
-
-```bash
-go build -ldflags "-X main.defaultContractFile=config/custom-contract.json"
-```
-
-## Markdown Output
-
-When using the `-output-md` flag, the program will generate an `output.md` file with the contract information formatted in Markdown. The output will include:
-
-- Basic contract information (ID, Title, Status)
-- Parties involved (with names, roles, and emails)
-- Contract terms (period and value)
-
-The markdown file can be viewed in any markdown viewer or converted to other formats using markdown tools.
+The database schema includes:
+- Contract ID
+- Title
+- Status
+- Parties (stored as JSON)
+- Terms (stored as JSON)
+- Created timestamp
 
 ## Building
 
-To build the program, simply run:
-```bash
-go build
-```
-
-This will create an executable named `goplayground` in the current directory.
-
-### Cross-Platform Building
-
-The repository includes a PowerShell script (`build.ps1`) that builds the application for multiple platforms:
+Use the build script to compile the program:
 
 ```powershell
+# Build with default contract file
 ./build.ps1
+
+# Build with custom contract file
+./build.ps1 -ContractFile "config/custom-contract.json"
 ```
 
-This will create executables for:
-- Linux (amd64 and arm64)
-- Windows (amd64 and arm64)
-- macOS (arm64 for M1/M2/M3)
-
-The built files will be placed in the `bin` directory.
-
-### Building with Custom Contract File
-
-You can also build the application with a custom default contract file:
-
-```powershell
-./build.ps1 -ContractFile "config/custom-contract.json"
-``` 
+The build script will:
+1. Build executables for all platforms
+2. Copy the executables to the bin directory
+3. Create a config directory inside bin
+4. Copy all JSON files from the config directory to bin/config 
