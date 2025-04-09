@@ -151,8 +151,8 @@ func TestDB(t *testing.T) {
 func TestInitDB(t *testing.T) {
 	// Test with invalid path
 	t.Run("InvalidPath", func(t *testing.T) {
-		// Use a path with invalid characters for Windows
-		_, err := InitDB("\\\\?\\invalid*path:db.sqlite")
+		// Use a path with null bytes which is invalid on all operating systems
+		_, err := InitDB("invalid\000path/db.sqlite")
 		if err == nil {
 			t.Error("Expected error with invalid path, got nil")
 		}
