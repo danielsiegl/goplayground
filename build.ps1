@@ -22,7 +22,11 @@ function Build-GoApplication {
         # Determine output filename based on OS
         $outputFile = if ($GOOS -eq "windows") {
             "goplayground-$GOOS-$GOARCH.exe"
-        } else {
+        } elseif ($GOOS -eq "darwin") 
+        {
+            "goplayground-macos-$GOARCH"
+        }
+        else {
             "goplayground-$GOOS-$GOARCH"
         }
 
