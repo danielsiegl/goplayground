@@ -23,6 +23,13 @@ var (
 func main() {
 	flag.Parse()
 
+	// Check if any flags are provided
+	if flag.NFlag() == 0 {
+		fmt.Println("No flags provided. Available options:")
+		flag.Usage()
+		return
+	}
+
 	// Initialize database if any database-related flags are used
 	var db *DB
 	if *storeContract || *listContracts || *deleteContract != "" {
@@ -63,25 +70,35 @@ func main() {
 		return
 	}
 
-	// Load the contract from the specified file
-	contract, err := LoadContract(*contractFile)
-	if err != nil {
-		fmt.Printf("Error loading contract: %v\n", err)
-		return
-	}
-
-	// Store the contract in the database if requested
+	// For store operation, we need a contract file
 	if *storeContract {
-		err := db.StoreContract(contract)
+		// Load the contract from the specified file
+		contract, err := LoadContract(*contractFile)
+		if err != nil {
+			fmt.Printf("Error loading contract from %s: %v\n", *contractFile, err)
+			fmt.Println("Please ensure the contract file exists and is valid JSON")
+			return
+		}
+
+		err = db.StoreContract(contract)
 		if err != nil {
 			fmt.Printf("Error storing contract: %v\n", err)
 			return
 		}
 		fmt.Printf("Contract %s stored successfully in database\n", contract.ID)
+		return
 	}
 
-	// Create markdown content using the ToMarkdown method
+	// Handle contract display if requested
 	if *showContract || *outputMarkdown {
+		// Load the contract from the specified file
+		contract, err := LoadContract(*contractFile)
+		if err != nil {
+			fmt.Printf("Error loading contract from %s: %v\n", *contractFile, err)
+			fmt.Println("Please ensure the contract file exists and is valid JSON")
+			return
+		}
+
 		markdown := contract.ToMarkdown()
 
 		// If output to file is requested
@@ -101,7 +118,4 @@ func main() {
 			return
 		}
 	}
-
-	// If no flags are provided, show help
-	flag.Usage()
 }
