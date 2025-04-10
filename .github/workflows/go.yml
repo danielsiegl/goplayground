@@ -70,10 +70,11 @@ jobs:
             shell: bash
             binary: linux
             arch: amd64
-          - os: ubuntu-latest
-            shell: bash
-            binary: linux
-            arch: arm64
+          # not working on GitHub ACitons  
+          # - os: ubuntu-latest
+          #   shell: bash
+          #   binary: linux
+          #   arch: arm64
           - os: macos-latest
             shell: bash
             binary: macos
@@ -86,10 +87,11 @@ jobs:
             shell: pwsh
             binary: windows
             arch: amd64
-          - os: windows-latest
-            shell: pwsh
-            binary: windows
-            arch: arm64
+          # not working on GitHub ACitons  but on real machine
+          # - os: windows-latest
+          #   shell: pwsh
+          #   binary: windows
+          #   arch: arm64
     defaults:
       run:
         shell: ${{ matrix.shell }}
