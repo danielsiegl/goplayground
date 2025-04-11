@@ -12,15 +12,44 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        arch: [arm64,amd64]
         include:
           - os: ubuntu-latest
             shell: bash
+            binary: linux
+            arch: amd64
+            archfriendly: amd64
+
+          # not working on GitHub ACitons  
+          # - os: ubuntu-latest
+          #   shell: bash
+          #   binary: linux
+          #   arch: arm64
+          #   archfriendly: arm64
+
+          - os: macos-latest-large
+            shell: bash
+            binary: macos
+            arch: x86_64
+            archfriendly: amd64
+
           - os: macos-latest
             shell: bash
+            binary: macos
+            arch: aarch64
+            archfriendly: arm64
+
           - os: windows-latest
             shell: pwsh
+            binary: windows
+            arch: amd64
+            archfriendly: amd64
+
+          # not working on GitHub ACitons  but on real machine
+          # - os: windows-latest
+          #   shell: pwsh
+          #   binary: windows
+          #   arch: aarch64
+          #   archfriendly: arm64
     defaults:
       run:
         shell: ${{ matrix.shell }}
@@ -46,7 +75,7 @@ jobs:
         Write-Output "Architecture: $architecture"
 
         # Create job summary
-        $summary = "System Information`n"
+        $summary = "Tests run on:`n"
         $summary += "OS Platform: $osPlatform`n"
         $summary += "Architecture: $architecture`n"
         $summary += "Matrix Configuration`n"
@@ -96,33 +125,39 @@ jobs:
             binary: linux
             arch: amd64
             archfriendly: amd64
-   # not working on GitHub ACitons  
-          - os: ubuntu-latest-arm64
-            shell: bash
-            binary: linux
-            arch: arm64
-            archfriendly: arm64
-          - os: macos-latest
+
+          # not working on GitHub ACitons  
+          # - os: ubuntu-latest
+          #   shell: bash
+          #   binary: linux
+          #   arch: arm64
+          #   archfriendly: arm64
+
+          - os: macos-latest-large
             shell: bash
             binary: macos
             arch: x86_64
             archfriendly: amd64
+
           - os: macos-latest
             shell: bash
             binary: macos
             arch: aarch64
             archfriendly: arm64
+
           - os: windows-latest
             shell: pwsh
             binary: windows
             arch: amd64
             archfriendly: amd64
+
           # not working on GitHub ACitons  but on real machine
-          - os: windows-latest
-            shell: pwsh
-            binary: windows
-            arch: aarch64
-            archfriendly: arm64
+          # - os: windows-latest
+          #   shell: pwsh
+          #   binary: windows
+          #   arch: aarch64
+          #   archfriendly: arm64
+
     defaults:
       run:
         shell: ${{ matrix.shell }}
@@ -147,7 +182,7 @@ jobs:
         Write-Output "Architecture: $architecture"
 
         # Create job summary
-        $summary = "System Information`n"
+        $summary = "Software run on:`n"
         $summary += "OS Platform: $osPlatform`n"
         $summary += "Architecture: $architecture`n"
         $summary += "Matrix Configuration`n"
