@@ -45,6 +45,19 @@ jobs:
         Write-Output "OS Platform: $osPlatform"
         Write-Output "Architecture: $architecture"
 
+        # Create job summary
+        $summary = "System Information`n"
+        $summary += "OS Platform: $osPlatform`n"
+        $summary += "Architecture: $architecture`n"
+        $summary += "Matrix Configuration`n"
+        $summary += "OS: ${{ matrix.os }}`n"
+        $summary += "Shell: ${{ matrix.shell }}`n"
+        $summary += "Binary: ${{ matrix.binary }}`n"
+        $summary += "Architecture: ${{ matrix.arch }}"
+
+        # Write to job summary
+        $summary | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+
     - name: Test
       run: go test -v ./...
 
@@ -82,28 +95,34 @@ jobs:
             shell: bash
             binary: linux
             arch: amd64
-          # not working on GitHub ACitons  
-          # - os: ubuntu-latest
-          #   shell: bash
-          #   binary: linux
-          #   arch: arm64
-          - os: macos-latest
+            archfriendly: amd64
+   # not working on GitHub ACitons  
+          - os: ubuntu-latest-arm64
             shell: bash
-            binary: macos
-            arch: amd64
-          - os: macos-latest
-            shell: bash
-            binary: macos
+            binary: linux
             arch: arm64
+            archfriendly: arm64
+          - os: macos-latest
+            shell: bash
+            binary: macos
+            arch: x86_64
+            archfriendly: amd64
+          - os: macos-latest
+            shell: bash
+            binary: macos
+            arch: aarch64
+            archfriendly: arm64
           - os: windows-latest
             shell: pwsh
             binary: windows
             arch: amd64
+            archfriendly: amd64
           # not working on GitHub ACitons  but on real machine
           - os: windows-latest
             shell: pwsh
             binary: windows
-            arch: arm64
+            arch: aarch64
+            archfriendly: arm64
     defaults:
       run:
         shell: ${{ matrix.shell }}
@@ -127,12 +146,26 @@ jobs:
         Write-Output "OS Platform: $osPlatform"
         Write-Output "Architecture: $architecture"
 
+        # Create job summary
+        $summary = "System Information`n"
+        $summary += "OS Platform: $osPlatform`n"
+        $summary += "Architecture: $architecture`n"
+        $summary += "Matrix Configuration`n"
+        $summary += "OS: ${{ matrix.os }}`n"
+        $summary += "Shell: ${{ matrix.shell }}`n"
+        $summary += "Binary: ${{ matrix.binary }}`n"
+        $summary += "Architecture: ${{ matrix.arch }}`n"
+        $summary += "Architecture Friendly: ${{ matrix.archfriendly }}`n"
+
+        # Write to job summary
+        $summary | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+
     - name: List artifacts directory
       run: ls -r bin
 
     - name: Make binary executable (Unix)
       if: matrix.os != 'windows-latest'
-      run: chmod +x bin/goplayground-${{ matrix.binary }}-${{ matrix.arch }}
+      run: chmod +x bin/goplayground-${{ matrix.binary }}-${{ matrix.archfriendly }}
       shell: bash
 
     - name: Run binary with -store option
@@ -141,7 +174,7 @@ jobs:
         # Create data directory for database
         mkdir -p data
         # Run the binary with -store option
-        ./bin/goplayground-${{ matrix.binary }}-${{ matrix.arch }} -contract-file ./bin/config/contract.json -store
+        ./bin/goplayground-${{ matrix.binary }}-${{ matrix.archfriendly }} -contract-file ./bin/config/contract.json -store
     
     - name: Run binary with -store option
       if: matrix.os == 'windows-latest'
