@@ -8,7 +8,7 @@ on:
   
 jobs:
   test:
-    name: Test on ${{ matrix.os }}-${{ matrix.arch }}
+    name: Test on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -17,40 +17,34 @@ jobs:
             shell: bash
             binary: linux
             arch: amd64
-            archfriendly: amd64
 
-          # not working on GitHub ACitons  
-          # - os: ubuntu-latest
-          #   shell: bash
-          #   binary: linux
-          #   arch: arm64
-          #   archfriendly: arm64
+         # https://github.com/actions/partner-runner-images
+          - os: ubuntu-24.04-arm
+            shell: bash
+            binary: linux
+            arch: arm64
 
           # needs a paid plan            
           # - os: macos-latest-large
           #   shell: bash
           #   binary: macos
-          #   arch: x86_64
-          #   archfriendly: amd64
+          #   arch: amd64
 
           - os: macos-latest
             shell: bash
             binary: macos
             arch: aarch64
-            archfriendly: arm64
 
           - os: windows-latest
             shell: pwsh
             binary: windows
             arch: amd64
-            archfriendly: amd64
 
           # not working on GitHub ACitons  but on real machine
           # - os: windows-latest
           #   shell: pwsh
           #   binary: windows
           #   arch: aarch64
-          #   archfriendly: arm64
     defaults:
       run:
         shell: ${{ matrix.shell }}
@@ -64,29 +58,13 @@ jobs:
         go-version: '1.20'
 
     - name: Output OS and Architecture
-      shell: pwsh
-      run: |
-        # host computer
-        # Determine OS and Architecture
-        $osPlatform = [System.Runtime.InteropServices.RuntimeInformation]::OSDescription
-        $architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
-
-        Write-Output "Running on:"
-        Write-Output "OS Platform: $osPlatform"
-        Write-Output "Architecture: $architecture"
-
-        # Create job summary
-        $summary = "Tests run on:`n"
-        $summary += "OS Platform: $osPlatform`n"
-        $summary += "Architecture: $architecture`n"
-        $summary += "Matrix Configuration`n"
-        $summary += "OS: ${{ matrix.os }}`n"
-        $summary += "Shell: ${{ matrix.shell }}`n"
-        $summary += "Binary: ${{ matrix.binary }}`n"
-        $summary += "Architecture: ${{ matrix.arch }}"
-
-        # Write to job summary
-        $summary | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+      uses: ./.github/workflows/os-info.yml
+      with:
+        title: "Tests run on"
+        matrix_os: ${{ matrix.os }}
+        matrix_shell: ${{ matrix.shell }}
+        matrix_binary: ${{ matrix.binary }}
+        matrix_arch: ${{ matrix.arch }}
 
     - name: Test
       run: go test -v ./...
@@ -125,41 +103,34 @@ jobs:
             shell: bash
             binary: linux
             arch: amd64
-            archfriendly: amd64
 
-         # not working on GitHub ACitons  
-         # https://github.com/actions/partner-runner-images
+          # https://github.com/actions/partner-runner-images
           - os: ubuntu-24.04-arm
             shell: bash
             binary: linux
             arch: arm64
-            archfriendly: arm64
 
           # needs a paid plan            
           # - os: macos-latest-large
           #   shell: bash
           #   binary: macos
-          #   arch: x86_64
-          #   archfriendly: amd64
+          #   arch: amd64
 
           - os: macos-latest
             shell: bash
             binary: macos
             arch: aarch64
-            archfriendly: arm64
 
           - os: windows-latest
             shell: pwsh
             binary: windows
             arch: amd64
-            archfriendly: amd64
 
           # not working on GitHub ACitons  but on real machine
           # - os: windows-latest
           #   shell: pwsh
           #   binary: windows
-          #   arch: aarch64
-          #   archfriendly: arm64
+          #   arch: aarch64 
 
     defaults:
       run:
@@ -173,52 +144,48 @@ jobs:
         path: bin
 
     - name: Output OS and Architecture
-      shell: pwsh
-      run: |
-        # host computer
-        # Determine OS and Architecture
-        $osPlatform = [System.Runtime.InteropServices.RuntimeInformation]::OSDescription
-        $architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
-
-        Write-Output "Running on:"
-        Write-Output "OS Platform: $osPlatform"
-        Write-Output "Architecture: $architecture"
-
-        # Create job summary
-        $summary = "Software run on:`n"
-        $summary += "OS Platform: $osPlatform`n"
-        $summary += "Architecture: $architecture`n"
-        $summary += "Matrix Configuration`n"
-        $summary += "OS: ${{ matrix.os }}`n"
-        $summary += "Shell: ${{ matrix.shell }}`n"
-        $summary += "Binary: ${{ matrix.binary }}`n"
-        $summary += "Architecture: ${{ matrix.arch }}`n"
-        $summary += "Architecture Friendly: ${{ matrix.archfriendly }}`n"
-
-        # Write to job summary
-        $summary | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+      uses: ./.github/workflows/os-info.yml
+      with:
+        title: "Software run on"
+        matrix_os: ${{ matrix.os }}
+        matrix_shell: ${{ matrix.shell }}
+        matrix_binary: ${{ matrix.binary }}
+        matrix_arch: ${{ matrix.arch }}
 
     - name: List artifacts directory
       run: ls -r bin
 
-    - name: Make binary executable (Unix)
-      if: matrix.os != 'windows-latest'
-      run: chmod +x bin/goplayground-${{ matrix.binary }}-${{ matrix.archfriendly }}
-      shell: bash
-
     - name: Run binary with -store option
       if: matrix.os != 'windows-latest'
       run: |
+        # make binary executable
+        chmod +x bin/goplayground-${{ matrix.binary }}-${{ matrix.arch }}
         # Create data directory for database
         mkdir -p data
-        # Run the binary with -store option
-        ./bin/goplayground-${{ matrix.binary }}-${{ matrix.archfriendly }} -contract-file ./bin/config/contract.json -store
+        # Store command for reuse
+        echo "COMMAND=./bin/goplayground-${{ matrix.binary }}-${{ matrix.arch }} -contract-file ./bin/config/contract.json -store" >> $GITHUB_ENV
     
     - name: Run binary with -store option
       if: matrix.os == 'windows-latest'
       run: |
-        
         # Create data directory for database
         mkdir -p data
-        # Run the binary with -store option
-        ./bin/goplayground-${{ matrix.binary }}-${{ matrix.arch }}.exe -contract-file ./bin/config/contract.json -store
+        # Store command for reuse
+        Write-Output "COMMAND=./bin/goplayground-${{ matrix.binary }}-${{ matrix.arch }}.exe -contract-file ./bin/config/contract.json -store" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+    - name: Execute and log command
+      run: |
+        echo "### Command executed:" >> $GITHUB_STEP_SUMMARY
+        echo "```${{ matrix.shell }}" >> $GITHUB_STEP_SUMMARY
+        echo "${{ env.COMMAND }}" >> $GITHUB_STEP_SUMMARY
+        echo "```" >> $GITHUB_STEP_SUMMARY
+        echo "### Command output:" >> $GITHUB_STEP_SUMMARY
+        echo "```${{ matrix.shell }}" >> $GITHUB_STEP_SUMMARY
+        if [ "${{ matrix.os }}" == "windows-latest" ]; then
+          $OUTPUT = & ${{ env.COMMAND }}
+          echo "$OUTPUT" >> $GITHUB_STEP_SUMMARY
+        else
+          OUTPUT=$(${{ env.COMMAND }})
+          echo "$OUTPUT" >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "```" >> $GITHUB_STEP_SUMMARY
