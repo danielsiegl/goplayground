@@ -98,13 +98,13 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            shell: bash
+            shell: pwsh
             binary: linux
             arch: amd64
 
           # https://github.com/actions/partner-runner-images
           - os: ubuntu-24.04-arm
-            shell: bash
+            shell: pwsh
             binary: linux
             arch: arm64
 
@@ -115,7 +115,7 @@ jobs:
           #   arch: amd64
 
           - os: macos-latest
-            shell: bash
+            shell: pwsh
             binary: macos
             arch: arm64
 
@@ -148,48 +148,40 @@ jobs:
       run: |
         ./.github/workflows/os-info.ps1 -Title "Software run on" -MatrixOS "${{ matrix.os }}" -MatrixShell "${{ matrix.shell }}" -MatrixBinary "${{ matrix.binary }}" -MatrixArch "${{ matrix.arch }}"
 
-    - name: List artifacts directory
-      run: ls -r bin
-
-    - name: Run binary with -store option
+    - name: Prepare binary and command for Linux/MacOS
       if: matrix.os != 'windows-latest'
       shell: pwsh
       run: |
         # make binary executable
         chmod +x bin/goplayground-${{ matrix.binary }}-${{ matrix.arch }}
-       
+        # Store command for reuse
         $command = "./bin/goplayground-${{ matrix.binary }}-${{ matrix.arch }} -contract-file ./bin/config/contract.json -store"
         echo "COMMAND=$command" >> $env:GITHUB_ENV
-        Write-Output "$command - ${{ env.COMMAND }}" >> $GITHUB_STEP_SUMMARY
-        
     
-    - name: Run binary with -store option
+    - name: Prepare binary and command for Windows
       if: matrix.os == 'windows-latest'
       shell: pwsh
       run: |
         # Store command for reuse
         $command = "./bin/goplayground-${{ matrix.binary }}-${{ matrix.arch }}.exe -contract-file ./bin/config/contract.json -store"
-        echo "COMMAND=$command" >> $env:GITHUB_ENV
-        Write-Output "$command - ${{ env.COMMAND }}" >> $GITHUB_STEP_SUMMARY
-        
+        echo "COMMAND=$command" >> $env:GITHUB_ENV     
         
     - name: Execute and log command
+      shell: pwsh
       run: |
         # Create data directory for database
-        mkdir -p data
+        New-Item -ItemType Directory -Force -Path data
 
-        echo "${{ env.COMMAND }}" 
+        Write-Output "Command: ${{ env.COMMAND }}"
         $OUTPUT = & ${{ env.COMMAND }}
-        echo $OUTPUT
+        Write-Output "Output:"
+        Write-Output $OUTPUT
 
-        echo "### Command executed:" >> $GITHUB_STEP_SUMMARY
-        echo "```${{ matrix.shell }}" >> $GITHUB_STEP_SUMMARY
-        echo "${{ env.COMMAND }}" >> $GITHUB_STEP_SUMMARY
-        echo "```" >> $GITHUB_STEP_SUMMARY
-        echo "### Command output:" >> $GITHUB_STEP_SUMMARY
-        echo "```${{ matrix.shell }}" >> $GITHUB_STEP_SUMMARY
-       
-        
-        echo "$OUTPUT" >> $GITHUB_STEP_SUMMARY
-        
-        echo "```" >> $GITHUB_STEP_SUMMARY
+        Write-Output "### Command executed:" >> $env:GITHUB_STEP_SUMMARY
+        Write-Output "``````${{ matrix.shell }}" >> $env:GITHUB_STEP_SUMMARY
+        Write-Output "${{ env.COMMAND }}" >> $env:GITHUB_STEP_SUMMARY
+        Write-Output "``````" >> $env:GITHUB_STEP_SUMMARY
+        Write-Output "### Command output:" >> $env:GITHUB_STEP_SUMMARY
+        Write-Output "``````${{ matrix.shell }}" >> $env:GITHUB_STEP_SUMMARY
+        Write-Output "$OUTPUT" >> $env:GITHUB_STEP_SUMMARY
+        Write-Output "``````" >> $env:GITHUB_STEP_SUMMARY
