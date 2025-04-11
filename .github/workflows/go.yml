@@ -126,12 +126,13 @@ jobs:
             arch: amd64
             archfriendly: amd64
 
-          # not working on GitHub ACitons  
-          # - os: ubuntu-latest
-          #   shell: bash
-          #   binary: linux
-          #   arch: arm64
-          #   archfriendly: arm64
+         # not working on GitHub ACitons  
+         # https://github.com/actions/partner-runner-images
+          - os: ubuntu-24.04-arm
+            shell: bash
+            binary: linux
+            arch: arm64
+            archfriendly: arm64
 
           - os: macos-latest-large
             shell: bash
