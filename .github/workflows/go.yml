@@ -33,7 +33,7 @@ jobs:
           - os: macos-latest
             shell: bash
             binary: macos
-            arch: aarch64
+            arch: arm64
 
           - os: windows-latest
             shell: pwsh
@@ -117,7 +117,7 @@ jobs:
           - os: macos-latest
             shell: bash
             binary: macos
-            arch: aarch64
+            arch: arm64
 
           - os: windows-latest
             shell: pwsh
@@ -178,17 +178,18 @@ jobs:
         
     - name: Execute and log command
       run: |
+        echo "${{ env.COMMAND }}" 
+        $OUTPUT = & ${{ env.COMMAND }}
+        echo $OUTPUT
+
         echo "### Command executed:" >> $GITHUB_STEP_SUMMARY
         echo "```${{ matrix.shell }}" >> $GITHUB_STEP_SUMMARY
         echo "${{ env.COMMAND }}" >> $GITHUB_STEP_SUMMARY
         echo "```" >> $GITHUB_STEP_SUMMARY
         echo "### Command output:" >> $GITHUB_STEP_SUMMARY
         echo "```${{ matrix.shell }}" >> $GITHUB_STEP_SUMMARY
-        if [ "${{ matrix.os }}" == "windows-latest" ]; then
-          $OUTPUT = & ${{ env.COMMAND }}
-          echo "$OUTPUT" >> $GITHUB_STEP_SUMMARY
-        else
-          OUTPUT=$(${{ env.COMMAND }})
-          echo "$OUTPUT" >> $GITHUB_STEP_SUMMARY
-        fi
+       
+        
+        echo "$OUTPUT" >> $GITHUB_STEP_SUMMARY
+        
         echo "```" >> $GITHUB_STEP_SUMMARY
