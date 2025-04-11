@@ -58,13 +58,9 @@ jobs:
         go-version: '1.20'
 
     - name: Output OS and Architecture
-      uses: ./.github/workflows/os-info.yml
-      with:
-        title: "Tests run on"
-        matrix_os: ${{ matrix.os }}
-        matrix_shell: ${{ matrix.shell }}
-        matrix_binary: ${{ matrix.binary }}
-        matrix_arch: ${{ matrix.arch }}
+      shell: pwsh
+      run: |
+        ./.github/workflows/os-info.ps1 -Title "Tests run on" -MatrixOS "${{ matrix.os }}" -MatrixShell "${{ matrix.shell }}" -MatrixBinary "${{ matrix.binary }}" -MatrixArch "${{ matrix.arch }}"
 
     - name: Test
       run: go test -v ./...
@@ -138,6 +134,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
     - name: Download binary artifacts
       uses: actions/download-artifact@v4
       with:
@@ -145,13 +142,9 @@ jobs:
         path: bin
 
     - name: Output OS and Architecture
-      uses: ./.github/workflows/os-info.yml
-      with:
-        title: "Software run on"
-        matrix_os: ${{ matrix.os }}
-        matrix_shell: ${{ matrix.shell }}
-        matrix_binary: ${{ matrix.binary }}
-        matrix_arch: ${{ matrix.arch }}
+      shell: pwsh
+      run: |
+        ./.github/workflows/os-info.ps1 -Title "Software run on" -MatrixOS "${{ matrix.os }}" -MatrixShell "${{ matrix.shell }}" -MatrixBinary "${{ matrix.binary }}" -MatrixArch "${{ matrix.arch }}"
 
     - name: List artifacts directory
       run: ls -r bin
