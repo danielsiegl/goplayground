@@ -4,51 +4,102 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 )
 
 // defaultContractFile is set at build time using -ldflags
 var defaultContractFile string
 
+var (
+	showContract   = flag.Bool("contract", false, "Show contract information")
+	outputMarkdown = flag.Bool("output-md", false, "Output contract information to output.md")
+	contractFile   = flag.String("contract-file", "config/contract.json", "Path to the contract.json file")
+	storeContract  = flag.Bool("store", false, "Store contract in database")
+	listContracts  = flag.Bool("list", false, "List all contracts in database")
+	deleteContract = flag.String("delete", "", "Delete contract with the specified ID from database")
+	dbPath         = flag.String("db", "data/contracts.db", "Path to the SQLite database file")
+)
+
 func main() {
-	// Define command-line flags
-	showContract := flag.Bool("contract", false, "Show contract information")
-	outputMarkdown := flag.Bool("output-md", false, "Output contract to output.md")
-
-	// Set default contract file path
-	defaultPath := "config/contract.json"
-	if defaultContractFile != "" {
-		defaultPath = defaultContractFile
-	}
-
-	contractFile := flag.String("contract-file", defaultPath, "Path to the contract.json file")
-
-	// Parse the flags
 	flag.Parse()
 
-	// Handle contract display if requested
-	if *showContract || *outputMarkdown {
-		contract, err := LoadContract(*contractFile)
+	// Check if any flags are provided
+	if flag.NFlag() == 0 {
+		fmt.Println("No flags provided. Available options:")
+		flag.Usage()
+		return
+	}
+
+	// Initialize database if any database-related flags are used
+	var db *DB
+	if *storeContract || *listContracts || *deleteContract != "" {
+		var err error
+		db, err = InitDB(*dbPath)
 		if err != nil {
-			fmt.Printf("Error loading contract: %v\n", err)
+			fmt.Printf("Error initializing database: %v\n", err)
+			return
+		}
+		defer db.Close()
+	}
+
+	// Handle delete operation
+	if *deleteContract != "" {
+		err := db.DeleteContract(*deleteContract)
+		if err != nil {
+			fmt.Printf("Error deleting contract: %v\n", err)
+			return
+		}
+		fmt.Printf("Contract %s deleted successfully from database\n", *deleteContract)
+		return
+	}
+
+	// Handle list operation
+	if *listContracts {
+		contracts, err := db.GetAllContracts()
+		if err != nil {
+			fmt.Printf("Error listing contracts: %v\n", err)
 			return
 		}
 
-		// Create markdown content
-		markdown := fmt.Sprintf("# Contract Information\n\n")
-		markdown += fmt.Sprintf("## Basic Information\n")
-		markdown += fmt.Sprintf("- **ID:** %s\n", contract.ID)
-		markdown += fmt.Sprintf("- **Title:** %s\n", contract.Title)
-		markdown += fmt.Sprintf("- **Status:** %s\n\n", contract.Status)
+		fmt.Println("Contracts in database:")
+		fmt.Printf("%-15s %-20s %-10s\n", "ID", "Title", "Status")
+		fmt.Println(strings.Repeat("-", 45))
+		for _, contract := range contracts {
+			fmt.Printf("%-15s %-20s %-10s\n", contract.ID, contract.Title, contract.Status)
+		}
+		return
+	}
 
-		markdown += fmt.Sprintf("## Parties\n")
-		for _, party := range contract.Parties {
-			markdown += fmt.Sprintf("### %s (%s)\n", party.Name, party.Role)
-			markdown += fmt.Sprintf("- Email: %s\n\n", party.Email)
+	// For store operation, we need a contract file
+	if *storeContract {
+		// Load the contract from the specified file
+		contract, err := LoadContract(*contractFile)
+		if err != nil {
+			fmt.Printf("Error loading contract from %s: %v\n", *contractFile, err)
+			fmt.Println("Please ensure the contract file exists and is valid JSON")
+			return
 		}
 
-		markdown += fmt.Sprintf("## Terms\n")
-		markdown += fmt.Sprintf("- **Period:** %s to %s\n", contract.Terms.StartDate, contract.Terms.EndDate)
-		markdown += fmt.Sprintf("- **Value:** %.2f %s\n", contract.Terms.Value, contract.Terms.Currency)
+		err = db.StoreContract(contract)
+		if err != nil {
+			fmt.Printf("Error storing contract: %v\n", err)
+			return
+		}
+		fmt.Printf("Contract %s stored successfully in database\n", contract.ID)
+		return
+	}
+
+	// Handle contract display if requested
+	if *showContract || *outputMarkdown {
+		// Load the contract from the specified file
+		contract, err := LoadContract(*contractFile)
+		if err != nil {
+			fmt.Printf("Error loading contract from %s: %v\n", *contractFile, err)
+			fmt.Println("Please ensure the contract file exists and is valid JSON")
+			return
+		}
+
+		markdown := contract.ToMarkdown()
 
 		// If output to file is requested
 		if *outputMarkdown {
@@ -67,7 +118,4 @@ func main() {
 			return
 		}
 	}
-
-	// If no flags are provided, show help
-	flag.Usage()
 }
