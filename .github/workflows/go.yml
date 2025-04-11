@@ -92,6 +92,8 @@ jobs:
     name: Run binary on ${{ matrix.os }}-${{ matrix.arch }}
     needs: build
     runs-on: ${{ matrix.os }}
+    env:
+      COMMAND: nocommand
     strategy:
       matrix:
         include:
@@ -151,22 +153,29 @@ jobs:
 
     - name: Run binary with -store option
       if: matrix.os != 'windows-latest'
+      shell: pwsh
       run: |
         # make binary executable
         chmod +x bin/goplayground-${{ matrix.binary }}-${{ matrix.arch }}
         # Create data directory for database
         mkdir -p data
-        # Store command for reuse
-        echo "COMMAND=./bin/goplayground-${{ matrix.binary }}-${{ matrix.arch }} -contract-file ./bin/config/contract.json -store" >> $GITHUB_ENV
+        $command = "./bin/goplayground-${{ matrix.binary }}-${{ matrix.arch }} -contract-file ./bin/config/contract.json -store"
+        Write-Output "COMMAND=$command" | Out-File -FilePath $env:GITHUB_ENV -Append
+        Write-Output "$command - ${{ env.COMMAND }}" >> $GITHUB_STEP_SUMMARY
+        
     
     - name: Run binary with -store option
       if: matrix.os == 'windows-latest'
+      shell: pwsh
       run: |
         # Create data directory for database
         mkdir -p data
         # Store command for reuse
-        Write-Output "COMMAND=./bin/goplayground-${{ matrix.binary }}-${{ matrix.arch }}.exe -contract-file ./bin/config/contract.json -store" | Out-File -FilePath $env:GITHUB_ENV -Append
-
+        $command = "./bin/goplayground-${{ matrix.binary }}-${{ matrix.arch }}.exe -contract-file ./bin/config/contract.json -store"
+        Write-Output "COMMAND=$command" | Out-File -FilePath $env:GITHUB_ENV -Append
+        Write-Output "$command - ${{ env.COMMAND }}" >> $GITHUB_STEP_SUMMARY
+        
+        
     - name: Execute and log command
       run: |
         echo "### Command executed:" >> $GITHUB_STEP_SUMMARY
