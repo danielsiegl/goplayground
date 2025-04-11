@@ -26,11 +26,12 @@ jobs:
           #   arch: arm64
           #   archfriendly: arm64
 
-          - os: macos-latest-large
-            shell: bash
-            binary: macos
-            arch: x86_64
-            archfriendly: amd64
+          # needs a paid plan            
+          # - os: macos-latest-large
+          #   shell: bash
+          #   binary: macos
+          #   arch: x86_64
+          #   archfriendly: amd64
 
           - os: macos-latest
             shell: bash
@@ -134,11 +135,12 @@ jobs:
             arch: arm64
             archfriendly: arm64
 
-          - os: macos-latest-large
-            shell: bash
-            binary: macos
-            arch: x86_64
-            archfriendly: amd64
+          # needs a paid plan            
+          # - os: macos-latest-large
+          #   shell: bash
+          #   binary: macos
+          #   arch: x86_64
+          #   archfriendly: amd64
 
           - os: macos-latest
             shell: bash
