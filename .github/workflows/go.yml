@@ -157,10 +157,9 @@ jobs:
       run: |
         # make binary executable
         chmod +x bin/goplayground-${{ matrix.binary }}-${{ matrix.arch }}
-        # Create data directory for database
-        mkdir -p data
+       
         $command = "./bin/goplayground-${{ matrix.binary }}-${{ matrix.arch }} -contract-file ./bin/config/contract.json -store"
-        Write-Output "COMMAND=$command" | Out-File -FilePath $env:GITHUB_ENV -Append
+        echo "COMMAND=$command" >> $env:GITHUB_ENV
         Write-Output "$command - ${{ env.COMMAND }}" >> $GITHUB_STEP_SUMMARY
         
     
@@ -168,16 +167,17 @@ jobs:
       if: matrix.os == 'windows-latest'
       shell: pwsh
       run: |
-        # Create data directory for database
-        mkdir -p data
         # Store command for reuse
         $command = "./bin/goplayground-${{ matrix.binary }}-${{ matrix.arch }}.exe -contract-file ./bin/config/contract.json -store"
-        Write-Output "COMMAND=$command" | Out-File -FilePath $env:GITHUB_ENV -Append
+        echo "COMMAND=$command" >> $env:GITHUB_ENV
         Write-Output "$command - ${{ env.COMMAND }}" >> $GITHUB_STEP_SUMMARY
         
         
     - name: Execute and log command
       run: |
+        # Create data directory for database
+        mkdir -p data
+
         echo "${{ env.COMMAND }}" 
         $OUTPUT = & ${{ env.COMMAND }}
         echo $OUTPUT
