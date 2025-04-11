@@ -1,0 +1,53 @@
+name: OS Information
+
+on:
+  workflow_call:
+    inputs:
+      title:
+        required: true
+        type: string
+        description: 'Title for the job summary'
+      matrix_os:
+        required: true
+        type: string
+        description: 'Matrix OS value'
+      matrix_shell:
+        required: true
+        type: string
+        description: 'Matrix shell value'
+      matrix_binary:
+        required: true
+        type: string
+        description: 'Matrix binary value'
+      matrix_arch:
+        required: true
+        type: string
+        description: 'Matrix architecture value'
+
+jobs:
+  output-info:
+    runs-on: ${{ inputs.matrix_os }}
+    steps:
+      - name: Output OS and Architecture
+        shell: pwsh
+        run: |
+          # Determine OS and Architecture
+          $osPlatform = [System.Runtime.InteropServices.RuntimeInformation]::OSDescription
+          $architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
+
+          Write-Output "Running on:"
+          Write-Output "OS Platform: $osPlatform"
+          Write-Output "Architecture: $architecture"
+
+          # Create job summary
+          $summary = "${{ inputs.title }}`n"
+          $summary += "OS Platform: $osPlatform`n"
+          $summary += "Architecture: $architecture`n"
+          $summary += "Matrix Configuration`n"
+          $summary += "OS: ${{ inputs.matrix_os }}`n"
+          $summary += "Shell: ${{ inputs.matrix_shell }}`n"
+          $summary += "Binary: ${{ inputs.matrix_binary }}`n"
+          $summary += "Architecture: ${{ inputs.matrix_arch }}"
+
+          # Write to job summary
+          $summary | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append 
