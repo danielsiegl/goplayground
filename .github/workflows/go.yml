@@ -88,10 +88,10 @@ jobs:
             binary: windows
             arch: amd64
           # not working on GitHub ACitons  but on real machine
-          # - os: windows-latest
-          #   shell: pwsh
-          #   binary: windows
-          #   arch: arm64
+          - os: windows-latest
+            shell: pwsh
+            binary: windows
+            arch: arm64
     defaults:
       run:
         shell: ${{ matrix.shell }}
@@ -122,6 +122,14 @@ jobs:
     - name: Run binary with -store option
       if: matrix.os == 'windows-latest'
       run: |
+        # host computer
+        # Determine OS and Architecture
+        $osPlatform = [System.Runtime.InteropServices.RuntimeInformation]::OSDescription
+        $architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
+
+        Write-Output "Running on:"
+        Write-Output "OS Platform: $osPlatform"
+        Write-Output "Architecture: $architecture"
         # Create data directory for database
         mkdir -p data
         # Run the binary with -store option

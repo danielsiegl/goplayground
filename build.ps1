@@ -64,6 +64,16 @@ function Build-GoApplication {
     }
 }
 
+
+# host computer
+# Determine OS and Architecture
+$osPlatform = [System.Runtime.InteropServices.RuntimeInformation]::OSDescription
+$architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
+
+Write-Output "Building on:"
+Write-Output "OS Platform: $osPlatform"
+Write-Output "Architecture: $architecture"
+
 # Build for Linux
 Build-GoApplication -GOOS "linux"
 Build-GoApplication -GOOS "linux" -GOARCH "arm64"
