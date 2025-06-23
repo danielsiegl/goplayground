@@ -12,6 +12,7 @@ A command-line tool for viewing, storing, and managing contracts.
 - Delete contracts from the database
 - Customizable contract file path
 - More details
+- TODO: Make more verbose
 
 ## Usage
 
