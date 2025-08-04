@@ -108,3 +108,13 @@ The build script will:
 2. Copy the executables to the bin directory
 3. Create a config directory inside bin
 4. Copy all JSON files from the config directory to bin/config 
+## Codex Workspace Tool
+
+Launch a ChatGPT Codex workspace for a specific project and branch:
+
+```bash
+go run ./cmd/codex -project owner/repo -branch main
+```
+
+The command opens `https://chatgpt.com/codex/owner/repo?branch=main` in your default browser.
+
